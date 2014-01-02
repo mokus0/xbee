@@ -18,17 +18,21 @@ Library
   ghc-options:          -Wall
   hs-source-dirs:       src
   exposed-modules:      Network.Protocol.XBee
+                        Network.Protocol.XBee.Common.Frame
+                        Network.Protocol.XBee.Common.Envelope
+                        Network.Protocol.XBee.Common.Escape
                         Network.Protocol.XBee.Series1
                         Network.Protocol.XBee.Series1.Addr
-                        Network.Protocol.XBee.Series1.Envelope
-                        Network.Protocol.XBee.Series1.Escape
-                        Network.Protocol.XBee.Series1.Frame
                         Network.Protocol.XBee.Series1.Frame.ATCmd
                         Network.Protocol.XBee.Series1.Frame.ATResponse
                         Network.Protocol.XBee.Series1.Frame.ModemStatus
                         Network.Protocol.XBee.Series1.Frame.Rx
                         Network.Protocol.XBee.Series1.Frame.Tx
                         Network.Protocol.XBee.Series1.Frame.TxStat
+                        Network.Protocol.XBee.Series2
+                        Network.Protocol.XBee.Series2.Frame.Rx
+                        Network.Protocol.XBee.Series2.Frame.Tx
+                        Network.Protocol.XBee.Series2.Frame.TxStat
   build-depends:        base >= 3 && < 5,
                         bytestring,
                         cereal,

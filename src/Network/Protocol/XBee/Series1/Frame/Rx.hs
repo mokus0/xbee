@@ -2,7 +2,7 @@
 module Network.Protocol.XBee.Series1.Frame.Rx where
 
 import Network.Protocol.XBee.Series1.Addr
-import Network.Protocol.XBee.Series1.Frame
+import Network.Protocol.XBee.Common.Frame
 
 import Control.Applicative
 import qualified Data.ByteString as BS
@@ -14,7 +14,7 @@ newtype RxOpts = RxOpts {getRxOpts :: Word8}
     deriving (Eq, Ord, Read, Show, Bits)
 
 rxAddrBroadcast, rxPANIDBroadcast :: RxOpts
-rxAddrBroadcast   = bit 1
+rxAddrBroadcast   = bit 1 -- TODO: double-check that i didn't mean "bit 0", change to hex to make it clearer
 rxPANIDBroadcast  = bit 2
 
 data Rx = Rx

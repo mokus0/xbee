@@ -1,4 +1,4 @@
-module Network.Protocol.XBee.Series1.Escape
+module Network.Protocol.XBee.Common.Escape
     ( putEscaped
     , getEscaped
     ) where

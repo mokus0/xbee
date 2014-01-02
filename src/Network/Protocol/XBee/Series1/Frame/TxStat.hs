@@ -1,6 +1,6 @@
 module Network.Protocol.XBee.Series1.Frame.TxStat where
 
-import Network.Protocol.XBee.Series1.Frame
+import Network.Protocol.XBee.Common.Frame
 
 import Control.Applicative
 import Data.Serialize

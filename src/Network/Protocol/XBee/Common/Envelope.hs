@@ -1,9 +1,9 @@
-module Network.Protocol.XBee.Series1.Envelope
+module Network.Protocol.XBee.Common.Envelope
     ( putEnvelope
     , getEnvelope
     ) where
 
-import Network.Protocol.XBee.Series1.Escape
+import Network.Protocol.XBee.Common.Escape
 
 import Control.Applicative
 import Control.Monad

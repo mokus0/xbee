@@ -1,7 +1,7 @@
 module Network.Protocol.XBee.Series1.Frame.ATResponse where
 
 import Network.Protocol.XBee.Series1.Addr
-import Network.Protocol.XBee.Series1.Frame
+import Network.Protocol.XBee.Common.Frame
 
 import Control.Applicative
 import qualified Data.ByteString as BS

@@ -1,11 +1,16 @@
-module Network.Protocol.XBee.Series1.Frame where
+module Network.Protocol.XBee.Common.Frame where
 
-import Network.Protocol.XBee.Series1.Envelope
+import Network.Protocol.XBee.Common.Envelope
 
 import Data.Serialize
 import Data.Traversable (sequenceA)
 import Data.Word
 
+class Frame f where
+    putFrame :: Bool -> f -> Put
+    getFrame :: Bool -> Get f
+
+-- TODO: rename this, maybe "FrameContents"
 class ApiFrame t where
     apiType :: t -> Word8
     putBody :: t -> Put

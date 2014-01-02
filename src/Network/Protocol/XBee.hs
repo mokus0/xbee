@@ -7,7 +7,7 @@ module Network.Protocol.XBee
     , closeXBee
     ) where
 
-import Network.Protocol.XBee.Series1
+import Network.Protocol.XBee.Common.Frame
 
 import Control.Applicative
 import Control.Concurrent
@@ -18,27 +18,27 @@ import qualified Data.ByteString as BS
 import Data.Serialize
 import System.IO
 
-data TxControlMsg
-    = Send !Frame
+data TxControlMsg f
+    = Send !f
     | EndTx
 
-data RxControlMsg
-    = Rcv       !Frame
+data RxControlMsg f
+    = Rcv       !f
     | FrameErr  !String
     | Exc       !SomeException
     | EndRx
 
-data XBee = XBee
+data XBee f = XBee
     { handle        :: !Handle
     
-    , rxChan        :: !(TQueue RxControlMsg)
+    , rxChan        :: !(TQueue (RxControlMsg f))
     , rxThreadId    :: !ThreadId
     
-    , txChan        :: !(TQueue TxControlMsg)
+    , txChan        :: !(TQueue (TxControlMsg f))
     , txThreadId    :: !ThreadId
     }
 
-runXBee :: Bool -> Handle -> IO XBee
+runXBee :: Frame f => Bool -> Handle -> IO (XBee f)
 runXBee esc h = do
     hSetBuffering h NoBuffering
     mfix $ \xbee -> XBee h <$> newTQueueIO
@@ -47,7 +47,7 @@ runXBee esc h = do
        <*> forkIO (txThread esc xbee)
 
 -- TODO: fix this interface, it's ugly (too much 'fail', no nonblocking read, etc)
-readXBee :: XBee -> IO Frame
+readXBee :: XBee f -> IO f
 readXBee XBee{..} = do
     msg <- atomically $ do
         msg <- readTQueue rxChan
@@ -62,13 +62,13 @@ readXBee XBee{..} = do
         Exc      e  -> throwIO e
         EndRx       -> fail "readXBee: connection is closed"
 
-writeXBee :: XBee -> Frame -> IO ()
+writeXBee :: XBee f -> f -> IO ()
 writeXBee x = atomically . writeTQueue (txChan x) . Send
 
-closeXBee :: XBee -> IO ()
+closeXBee :: XBee f -> IO ()
 closeXBee XBee{..} = atomically (writeTQueue txChan EndTx)
 
-rxThread :: Bool -> XBee -> IO ()
+rxThread :: Frame f => Bool -> XBee f -> IO ()
 rxThread esc XBee{..} = go start
     where
         nTries  = 3 :: Int
@@ -87,11 +87,11 @@ rxThread esc XBee{..} = go start
         start           = restart BS.empty
         restart         = runGetPartial (getFrame esc)
         
-        go (Fail msg)   = atomically (writeTQueue rxChan (FrameErr msg)) >> go start -- TODO: resync
-        go (Partial k)  = maybe (atomically (writeTQueue rxChan EndRx)) (go . k) =<< next 
-        go (Done f bs)  = atomically (writeTQueue rxChan (Rcv f)) >> go (restart bs)
+        go (Fail msg bs)    = atomically (writeTQueue rxChan (FrameErr msg)) >> go start -- TODO: resync
+        go (Partial k)      = maybe (atomically (writeTQueue rxChan EndRx)) (go . k) =<< next 
+        go (Done f bs)      = atomically (writeTQueue rxChan (Rcv f)) >> go (restart bs)
         
-txThread :: Bool -> XBee -> IO ()
+txThread :: Frame f => Bool -> XBee f -> IO ()
 txThread esc XBee{..} = go =<< next
     where
         next = atomically (readTQueue txChan)
